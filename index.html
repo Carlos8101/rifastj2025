@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Registro Rifa</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<h1>🎟️ Elige tu boleto</h1>
+
+<div class="box">
+<input id="nombre" placeholder="Nombre completo">
+<input id="telefono" placeholder="Teléfono">
+<input id="boleto" placeholder="Boleto (0001-10000)">
+<button onclick="registrar()">Registrar</button>
+<p>📌 El boleto queda reservado hasta confirmar pago.</p>
+</div>
+
+<script>
+async function registrar() {
+    const nombre = document.getElementById("nombre").value;
+    const telefono = document.getElementById("telefono").value;
+    const boleto = document.getElementById("boleto").value.padStart(4,'0');
+
+    if(!nombre || !telefono || boleto < "0001" || boleto > "10000") return alert("Datos inválidos");
+
+    // Leer JSON local
+    let data = [];
+    try {
+        const response = await fetch("boletos.json");
+        data = await response.json();
+    } catch(e) { console.log(e); }
+
+    if(data.some(d => d.boleto === boleto)) return alert("Boleto ocupado");
+
+    data.push({boleto, nombre, telefono, estado:"reservado"});
+
+    // Guardar JSON actualizado (solo funciona en servidor local)
+    const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "boletos.json";
+    a.click();
+
+    alert("Registro exitoso. Guarda el archivo descargado como boletos.json reemplazando el anterior");
+}
+</script>
+
+</body>
+</html>

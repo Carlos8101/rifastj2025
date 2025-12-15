@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Boletos Ocupados</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<h1>🎟️ Boletos Ocupados</h1>
+<div id="contenedor"></div>
+
+<script>
+async function mostrarBoletos(){
+    let vendidos = [];
+    try {
+        const response = await fetch("boletos.json");
+        vendidos = (await response.json()).map(d => d.boleto);
+    } catch(e) { console.log(e); }
+
+    const cont = document.getElementById("contenedor");
+    for(let i=1;i<=10000;i++){
+        const b = i.toString().padStart(4,'0');
+        const div = document.createElement("div");
+        div.className = "boleto" + (vendidos.includes(b) ? " ocupado" : "");
+        div.innerText = b;
+        cont.appendChild(div);
+    }
+}
+
+mostrarBoletos();
+</script>
+
+</body>
+</html>

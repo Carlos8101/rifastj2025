@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Admin Rifa</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<h1>🎛️ Panel Administrador</h1>
+
+<div class="box">
+<button onclick="sortear()">🎉 Sortear</button>
+<h2 id="ganador"></h2>
+<button onclick="exportar()">📤 Exportar Excel</button>
+</div>
+
+<div class="box">
+<table>
+<thead>
+<tr><th>Boleto</th><th>Nombre</th><th>Teléfono</th><th>Estado</th></tr>
+</thead>
+<tbody id="tabla"></tbody>
+</table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+let datos = [];
+
+async function cargar(){
+    try {
+        const response = await fetch("boletos.json");
+        datos = await response.json();
+    } catch(e){console.log(e);}
+
+    const tabla = document.getElementById("tabla");
+    tabla.innerHTML = "";
+    datos.forEach(d=>{
+        tabla.innerHTML += `<tr>
+        <td>${d.boleto}</td>
+        <td>${d.nombre}</td>
+        <td>${d.telefono}</td>
+        <td>${d.estado}</td>
+        </tr>`;
+    });
+}
+
+window.sortear = ()=>{
+    const pagados = datos; // todos los registrados
+    if(pagados.length===0) return alert("No hay boletos");
+    const g = pagados[Math.floor(Math.random()*pagados.length)];
+    document.getElementById("ganador").innerText = `🎉 Ganador: Boleto ${g.boleto} - ${g.nombre}`;
+};
+
+window.exportar = ()=>{
+    const ws = XLSX.utils.json_to_sheet(datos);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,"Rifa");
+    XLSX.writeFile(wb,"rifa.xlsx");
+};
+
+cargar();
+</script>
+
+</body>
+</html>
